@@ -533,4 +533,97 @@ document.addEventListener("DOMContentLoaded", function () {
                 info.el.style.cursor = "not-allowed";
             } else if (data.getTime() === hoje.getTime()) {
                 info.el.style.backgroundColor = "#d4edda";
-                info.el.style.border = "2px solid #28
+                info.el.style.border = "2px solid #28a745";
+            }
+        },
+        dateClick: function(info) {
+            const date = info.dateStr;
+            if (isDataPassada(date)) {
+                mostrarToast("❌ Data passada!", "error");
+                return;
+            }
+            if (role === "admin") {
+                const jaExiste = calendar.getEvents().some(e => e.startStr === date);
+                if (jaExiste) {
+                    mostrarToast("⚠️ Já disponível", "warning");
+                    return;
+                }
+                if (confirm(`Marcar ${formatarDataBrasileira(date)} como DISPONÍVEL?`)) {
+                    mostrarLoadingGlobal(true);
+                    fetch("/eventos", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ start: date })
+                    })
+                    .then(() => {
+                        calendar.refetchEvents();
+                        mostrarToast("✅ Data disponível!", "success");
+                    })
+                    .catch(() => mostrarToast("❌ Erro", "error"))
+                    .finally(() => mostrarLoadingGlobal(false));
+                }
+                return;
+            }
+            const disponivel = calendar.getEvents().some(e => e.startStr === date);
+            if (!disponivel) {
+                mostrarToast("⚠️ Data não disponível", "error");
+                return;
+            }
+            abrirFormulario(date);
+        },
+        eventClick: function(info) {
+            if (role !== "admin") return;
+            const data = info.event.startStr;
+            if (isDataPassada(data)) {
+                mostrarToast("❌ Não pode remover data passada", "error");
+                return;
+            }
+            if (confirm(`Remover ${formatarDataBrasileira(data)}?`)) {
+                mostrarLoadingGlobal(true);
+                fetch(`/eventos/${info.event.id}`, { method: "DELETE" })
+                    .then(() => {
+                        info.event.remove();
+                        mostrarToast("✅ Removida", "success");
+                    })
+                    .catch(() => mostrarToast("❌ Erro", "error"))
+                    .finally(() => mostrarLoadingGlobal(false));
+            }
+        }
+    });
+    calendar.render();
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const btnEnviar = document.getElementById("btnEnviarSolicitacao");
+    if (btnEnviar) {
+        btnEnviar.addEventListener("click", enviarSolicitacao);
+    }
+});
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.body.classList.add(savedTheme);
+    updateThemeButton(savedTheme);
+}
+
+function toggleTheme() {
+    const currentTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
+    document.body.classList.remove('light', 'dark');
+    document.body.classList.add(currentTheme);
+    localStorage.setItem('theme', currentTheme);
+    updateThemeButton(currentTheme);
+}
+
+function updateThemeButton(theme) {
+    const btn = document.getElementById('themeToggle');
+    if (btn) {
+        btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        btn.title = theme === 'dark' ? 'Modo claro' : 'Modo escuro';
+    }
+}
+
+initTheme();
+const themeBtn = document.getElementById('themeToggle');
+if (themeBtn) {
+    themeBtn.addEventListener('click', toggleTheme);
+}
