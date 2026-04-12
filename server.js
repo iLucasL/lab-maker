@@ -56,7 +56,7 @@ app.get("/eventos", (req, res) => {
 app.post("/eventos", (req, res) => {
     const { start } = req.body;
     if (isDataPassada(start)) {
-        return res.status(400).json({ erro: "Não é possível marcar datas passadas como disponíveis" });
+        return res.status(400).json({ erro: "Não é possível marcar datas passadas" });
     }
     const list = JSON.parse(fs.readFileSync(eventosFile));
     const novo = { id: Date.now(), title: "Disponível", start: start };
@@ -79,7 +79,7 @@ app.get("/solicitacoes", (req, res) => {
 app.post("/solicitacoes", (req, res) => {
     const { data, horarioInicio, horarioFim } = req.body;
     if (isDataPassada(data)) {
-        return res.status(400).json({ erro: "Não é possível solicitar agendamento em datas passadas" });
+        return res.status(400).json({ erro: "Data passada não pode" });
     }
     const solicitacoesExistentes = JSON.parse(fs.readFileSync(solFile));
     const solicitacoesMesmaData = solicitacoesExistentes.filter(s => s.data === data);
@@ -89,7 +89,7 @@ app.post("/solicitacoes", (req, res) => {
         return verificarConflito(novoAgendamento, existente);
     });
     if (temConflito) {
-        return res.status(400).json({ erro: "Este horário conflita com outro agendamento existente" });
+        return res.status(400).json({ erro: "Horário conflita com outro" });
     }
     const list = JSON.parse(fs.readFileSync(solFile));
     list.push({ id: Date.now(), ...req.body, status: "recebido" });
