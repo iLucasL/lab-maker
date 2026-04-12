@@ -1,6 +1,25 @@
 let dataSelecionada = "";
 let currentToastTimeout = null;
 
+function getAuthHeaders() {
+    const token = localStorage.getItem('authToken');
+    const role = localStorage.getItem('role');
+    if (role === 'admin' && token) {
+        return { 'Authorization': token };
+    }
+    return {};
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const role = localStorage.getItem("role");
+    const token = localStorage.getItem("authToken");
+    if (role === "admin" && !token) {
+        alert("Sessão expirada! Faça login novamente.");
+        localStorage.clear();
+        window.location.href = "index.html";
+    }
+});
+
 const TURNOS = {
     MANHA: { nome: "Manhã", inicio: "07:30", fim: "11:30", cor: "#2ecc71" },
     TARDE: { nome: "Tarde", inicio: "13:30", fim: "17:30", cor: "#3498db" },
@@ -136,6 +155,7 @@ function toggleFaq(element) {
 function logout() {
     if (confirm("Tem certeza que deseja sair?")) {
         localStorage.removeItem("role");
+        localStorage.removeItem("authToken");
         window.location.href = "index.html";
     }
 }
@@ -441,7 +461,10 @@ function criarCardSolicitacao(s) {
             mostrarLoadingGlobal(true);
             fetch("/solicitacoes/status", {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    ...getAuthHeaders()
+                },
                 body: JSON.stringify({ id: s.id, status: novoStatus })
             })
             .then(() => {
@@ -463,7 +486,10 @@ function criarCardSolicitacao(s) {
                 delBtn.disabled = true;
                 delBtn.innerHTML = "⏳";
                 mostrarLoadingGlobal(true);
-                fetch(`/solicitacoes/${s.id}`, { method: "DELETE" })
+                fetch(`/solicitacoes/${s.id}`, { 
+                    method: "DELETE",
+                    headers: getAuthHeaders()
+                })
                     .then(() => {
                         mostrarToast("✅ Excluída", "success");
                         carregarSolicitacoes();
@@ -552,7 +578,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     mostrarLoadingGlobal(true);
                     fetch("/eventos", {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: { 
+                            "Content-Type": "application/json",
+                            ...getAuthHeaders()
+                        },
                         body: JSON.stringify({ start: date })
                     })
                     .then(() => {
@@ -580,7 +609,10 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             if (confirm(`Remover ${formatarDataBrasileira(data)}?`)) {
                 mostrarLoadingGlobal(true);
-                fetch(`/eventos/${info.event.id}`, { method: "DELETE" })
+                fetch(`/eventos/${info.event.id}`, { 
+                    method: "DELETE",
+                    headers: getAuthHeaders()
+                })
                     .then(() => {
                         info.event.remove();
                         mostrarToast("✅ Removida", "success");
