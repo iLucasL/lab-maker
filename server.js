@@ -10,11 +10,9 @@ app.use(express.static(__dirname));
 
 const eventosFile = path.join(__dirname, "eventos.json");
 const solFile = path.join(__dirname, "solicitacoes.json");
-const usuariosFile = path.join(__dirname, "usuarios.json");
 
 if (!fs.existsSync(eventosFile)) fs.writeFileSync(eventosFile, "[]");
 if (!fs.existsSync(solFile)) fs.writeFileSync(solFile, "[]");
-if (!fs.existsSync(usuariosFile)) fs.writeFileSync(usuariosFile, JSON.stringify([{ id: 1, email: "admin@lab.com", senha: "123", role: "admin" }]));
 
 function isDataPassada(dataISO) {
     const hoje = new Date();
@@ -37,22 +35,10 @@ function verificarConflito(ag1, ag2) {
     return (inicio1 < fim2 && fim1 > inicio2);
 }
 
-function verificarAuth(req, res, next) {
-    const token = req.headers.authorization;
-    if (!token) {
-        return res.status(401).json({ erro: "Não autorizado" });
-    }
-    next();
-}
-
 app.post("/login-admin", (req, res) => {
     const { email, senha } = req.body;
-    const usuarios = JSON.parse(fs.readFileSync(usuariosFile));
-    const usuario = usuarios.find(u => u.email === email && u.senha === senha);
-    
-    if (usuario) {
-        const token = Date.now().toString(36) + Math.random().toString(36).substring(2);
-        return res.json({ ok: true, token: token, role: usuario.role });
+    if (email === "admin@lab.com" && senha === "123") {
+        return res.json({ ok: true, role: "admin" });
     }
     res.status(400).json({ erro: "inválido" });
 });
@@ -67,7 +53,7 @@ app.get("/eventos", (req, res) => {
     res.json(JSON.parse(fs.readFileSync(eventosFile)));
 });
 
-app.post("/eventos", verificarAuth, (req, res) => {
+app.post("/eventos", (req, res) => {
     const { start } = req.body;
     if (isDataPassada(start)) {
         return res.status(400).json({ erro: "Não é possível marcar datas passadas como disponíveis" });
@@ -79,7 +65,7 @@ app.post("/eventos", verificarAuth, (req, res) => {
     res.json(novo);
 });
 
-app.delete("/eventos/:id", verificarAuth, (req, res) => {
+app.delete("/eventos/:id", (req, res) => {
     let list = JSON.parse(fs.readFileSync(eventosFile));
     list = list.filter(e => String(e.id) !== String(req.params.id));
     fs.writeFileSync(eventosFile, JSON.stringify(list, null, 2));
@@ -111,7 +97,7 @@ app.post("/solicitacoes", (req, res) => {
     res.json({ ok: true });
 });
 
-app.put("/solicitacoes/status", verificarAuth, (req, res) => {
+app.put("/solicitacoes/status", (req, res) => {
     const { id, status } = req.body;
     let list = JSON.parse(fs.readFileSync(solFile));
     list = list.map(s => {
@@ -124,7 +110,7 @@ app.put("/solicitacoes/status", verificarAuth, (req, res) => {
     res.json({ ok: true });
 });
 
-app.delete("/solicitacoes/:id", verificarAuth, (req, res) => {
+app.delete("/solicitacoes/:id", (req, res) => {
     let list = JSON.parse(fs.readFileSync(solFile));
     list = list.filter(s => String(s.id) !== String(req.params.id));
     fs.writeFileSync(solFile, JSON.stringify(list, null, 2));
