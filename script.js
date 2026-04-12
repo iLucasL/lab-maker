@@ -29,7 +29,8 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
         const data = await res.json();
         if (res.ok) {
             mostrarToast("✅ Login realizado com sucesso!", "success");
-            localStorage.setItem("role", "admin");
+            // USAR sessionStorage em vez de localStorage
+            sessionStorage.setItem("role", "admin");
             window.location.href = "home.html";
         } else {
             mostrarToast("❌ Email ou senha inválidos", "error");
@@ -44,7 +45,7 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
 
 function entrarSolicitante() {
     mostrarToast("✅ Entrando como solicitante...", "success");
-    localStorage.setItem("role", "user");
+    sessionStorage.setItem("role", "user");
     window.location.href = "home.html";
 }
 
