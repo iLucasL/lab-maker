@@ -1,0 +1,112 @@
+document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const tab = btn.getAttribute("data-tab");
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".login-panel").forEach(p => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(`${tab}Panel`).classList.add("active");
+    });
+});
+
+document.getElementById("btnLogin").addEventListener("click", async () => {
+    const email = document.getElementById("loginEmail").value.trim();
+    const senha = document.getElementById("loginSenha").value.trim();
+    if (!email || !senha) {
+        mostrarToast("Preencha todos os campos!", "error");
+        return;
+    }
+    const btn = document.getElementById("btnLogin");
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "🔄 Verificando...";
+    btn.disabled = true;
+    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+        const res = await fetch("/login-admin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, senha })
+        });
+        if (res.ok) {
+            mostrarToast("✅ Login realizado com sucesso!", "success");
+            localStorage.setItem("role", "admin");
+            setTimeout(() => {
+                window.location.href = "home.html";
+            }, 500);
+        } else {
+            mostrarToast("❌ Email ou senha inválidos", "error");
+        }
+    } catch (err) {
+        mostrarToast("❌ Erro ao conectar ao servidor", "error");
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+});
+
+function entrarSolicitante() {
+    mostrarToast("✅ Entrando como solicitante...", "success");
+    localStorage.setItem("role", "user");
+    setTimeout(() => {
+        window.location.href = "home.html";
+    }, 300);
+}
+
+document.getElementById("esqueciSenha").addEventListener("click", async (e) => {
+    e.preventDefault();
+    const email = prompt("Digite seu email cadastrado:");
+    if (!email) return;
+    const novaSenha = prompt("Digite a nova senha:");
+    if (!novaSenha || novaSenha.length < 3) {
+        mostrarToast("Senha deve ter pelo menos 3 caracteres", "error");
+        return;
+    }
+    try {
+        await fetch("/redefinir-senha", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, novaSenha })
+        });
+        mostrarToast("✅ Senha atualizada com sucesso!", "success");
+    } catch (err) {
+        mostrarToast("❌ Erro ao redefinir senha", "error");
+    }
+});
+
+let toastTimeout;
+function mostrarToast(mensagem, tipo = "success") {
+    const toast = document.getElementById("toast");
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toast.textContent = mensagem;
+    toast.className = `toast ${tipo} show`;
+    toastTimeout = setTimeout(() => {
+        toast.className = "toast";
+    }, 3000);
+}
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.body.classList.add(savedTheme);
+    updateThemeButton(savedTheme);
+}
+
+function toggleTheme() {
+    const currentTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
+    document.body.classList.remove('light', 'dark');
+    document.body.classList.add(currentTheme);
+    localStorage.setItem('theme', currentTheme);
+    updateThemeButton(currentTheme);
+}
+
+function updateThemeButton(theme) {
+    const btn = document.getElementById('themeToggle');
+    if (btn) {
+        btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        btn.title = theme === 'dark' ? 'Modo claro' : 'Modo escuro';
+    }
+}
+
+initTheme();
+const themeBtn = document.getElementById('themeToggle');
+if (themeBtn) {
+    themeBtn.addEventListener('click', toggleTheme);
+}

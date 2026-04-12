@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Lab Maker - Sistema de Agendamentos</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+</head>
+<body class="home light">
+<div class="layout">
+    <div class="sidebar">
+        <div class="logo-area">
+            <div class="logo-container">
+                <img src="src/senai.png" alt="SENAI" class="logo-img">
+                <h2>Lab Maker</h2>
+            </div>
+            <span class="user-badge" id="userRoleBadge"></span>
+        </div>
+        <nav class="sidebar-nav">
+            <button onclick="mostrar('agendamentos')" class="nav-btn" data-page="agendamentos">📅 Agendamentos</button>
+            <button onclick="mostrar('solicitacoes')" class="nav-btn" data-page="solicitacoes">📝 Solicitações</button>
+            <button onclick="mostrar('faq')" class="nav-btn" data-page="faq">❓ FAQ / Ajuda</button>
+        </nav>
+        <button onclick="logout()" class="logout-btn">🚪 Sair</button>
+    </div>
+    <div class="content">
+        <div id="agendamentos" class="page active">
+            <div class="page-header">
+                <h1>📅 Agendamentos</h1>
+                <p class="subtitle">Selecione uma data disponível para solicitar seu horário</p>
+            </div>
+            <div class="calendar-wrapper">
+                <div id="calendar"></div>
+            </div>
+        </div>
+        <div id="solicitacoes" class="page">
+            <div class="page-header">
+                <h1>📝 Solicitações</h1>
+                <p class="subtitle">Acompanhe o status dos seus pedidos</p>
+            </div>
+            <div id="solicitacoesList" class="kanban-container"></div>
+        </div>
+        <div id="faq" class="page">
+            <div class="page-header">
+                <h1>❓ FAQ - Como funciona o sistema?</h1>
+                <p class="subtitle">Tire suas dúvidas sobre o Lab Maker</p>
+            </div>
+            <div class="faq-container">
+                <div class="faq-category">
+                    <h2>👤 Para Solicitantes</h2>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>📅 Como faço um agendamento?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>1. Acesse a aba "Agendamentos"<br>2. No calendário, clique em uma data disponível (marcada em verde)<br>3. Preencha o formulário com seus dados<br>4. Escolha o horário de INÍCIO e depois o horário de TÉRMINO<br>5. Anexe arquivos se necessário (imagem ou PDF)<br>6. Clique em "Enviar Solicitação"</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>⏰ Como funcionam os turnos?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>🌅 Manhã: 07:30 às 11:30<br>🌙 Tarde: 13:30 às 17:30<br>🌙 Noite: 18:30 às 22:30<br><strong>Não é permitido agendar cruzando turnos diferentes!</strong></p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>📊 Como acompanho minhas solicitações?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Acesse a aba "Solicitações". Lá você verá todos os seus pedidos organizados por status (Recebido, Análise, Fazendo, Concluído).</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>📎 Quais arquivos posso anexar?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Você pode anexar imagens (JPG, PNG) e arquivos PDF. O tamanho máximo é de 10MB por arquivo.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-category">
+                    <h2>👑 Para Administradores</h2>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>✅ Como marcar datas disponíveis?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>No calendário (aba Agendamentos), clique em qualquer data FUTURA que deseja liberar. Confirme a ação e a data ficará marcada em verde.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>🔄 Como atualizar o status de uma solicitação?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>No Kanban (aba Solicitações), use o menu suspenso em cada card para alterar o status.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>🗑️ Posso excluir uma solicitação?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Sim! Como administrador, você verá um botão "Excluir" em cada card.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-category">
+                    <h2>⚙️ Dicas Gerais</h2>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>🔔 Como sei se minha solicitação foi enviada?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Um toast de confirmação aparecerá no canto inferior da tela.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>📱 Posso acessar pelo celular?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Sim! O sistema é totalmente responsivo.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>💾 Meus dados ficam salvos?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Sim, todas as solicitações são salvas automaticamente no servidor.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modal" class="modal" role="dialog" aria-label="Formulário de solicitação">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>📋 Nova Solicitação</h2>
+            <button class="modal-close" onclick="fecharModal()" aria-label="Fechar">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="info-alert" id="dataSelecionada"></div>
+            <div class="form-group">
+                <label>👤 Nome completo *</label>
+                <input type="text" id="nome" placeholder="Digite seu nome completo" autocomplete="name">
+            </div>
+            <div class="form-group">
+                <label>📱 Celular *</label>
+                <input type="tel" id="celular" placeholder="(00) 00000-0000" autocomplete="tel">
+                <small class="field-hint">Ex: (11) 91234-5678</small>
+            </div>
+            <div class="form-group">
+                <label>👥 Número de pessoas *</label>
+                <input type="number" id="pessoas" placeholder="Quantidade" min="1" max="50">
+            </div>
+            <div class="horario-container">
+                <div class="horario-box">
+                    <label>⏰ Horário de INÍCIO *</label>
+                    <select id="horarioInicioSelect" class="horario-select">
+                        <option value="">Selecione o horário de início</option>
+                    </select>
+                </div>
+                <div class="horario-box">
+                    <label>⏰ Horário de TÉRMINO *</label>
+                    <select id="horarioFimSelect" class="horario-select" disabled>
+                        <option value="">Primeiro selecione o horário de início</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>📝 Descrição da solicitação *</label>
+                <textarea id="descricao" placeholder="Descreva o que deseja fazer no laboratório..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label>🔧 Especificações técnicas (opcional)</label>
+                <textarea id="especificacoes" placeholder="Equipamentos, softwares, materiais necessários..."></textarea>
+                <small class="field-hint">Informe equipamentos ou softwares necessários</small>
+            </div>
+            <div class="form-group">
+                <label>📎 Anexo (imagem ou PDF)</label>
+                <input type="file" id="anexo" accept="image/*,application/pdf">
+                <small class="field-hint">Formatos: JPG, PNG, PDF (máx 10MB)</small>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="btnEnviarSolicitacao" class="btn-primary">✓ Enviar Solicitação</button>
+            <button onclick="fecharModal()" class="btn-secondary">Cancelar</button>
+        </div>
+    </div>
+</div>
+<div id="globalLoading" class="global-loading" style="display: none;">
+    <div class="loading-content">
+        <div class="loading-spinner-large"></div>
+        <p>Processando...</p>
+    </div>
+</div>
+<div id="imgModal" class="img-modal" onclick="fecharImagemModal()">
+    <img id="imgModalContent" alt="Visualização da imagem">
+    <button class="img-modal-close" onclick="fecharImagemModal()" aria-label="Fechar">✕</button>
+</div>
+<div id="toast" class="toast"></div>
+<button class="theme-toggle" id="themeToggle" title="Alternar tema">🌙</button>
+<script src="home.js"></script>
+</body>
+</html>
