@@ -26,9 +26,11 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, senha })
         });
+        const data = await res.json();
         if (res.ok) {
             mostrarToast("✅ Login realizado com sucesso!", "success");
-            localStorage.setItem("role", "admin");
+            localStorage.setItem("role", data.role);
+            localStorage.setItem("authToken", data.token);
             setTimeout(() => {
                 window.location.href = "home.html";
             }, 500);
@@ -46,6 +48,7 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
 function entrarSolicitante() {
     mostrarToast("✅ Entrando como solicitante...", "success");
     localStorage.setItem("role", "user");
+    localStorage.removeItem("authToken");
     setTimeout(() => {
         window.location.href = "home.html";
     }, 300);
