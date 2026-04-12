@@ -135,7 +135,7 @@ function toggleFaq(element) {
 
 function logout() {
     if (confirm("Tem certeza que deseja sair?")) {
-        localStorage.removeItem("role");
+        sessionStorage.removeItem("role");
         window.location.href = "index.html";
     }
 }
@@ -428,7 +428,7 @@ function criarCardSolicitacao(s) {
         }
     }
     div.innerHTML = `<div class="card-id">#${s.id}</div><div class="card-title">${escapeHtml(s.nome)}</div><div class="card-details"><div>📞 ${escapeHtml(s.celular)}</div><div>👥 ${s.pessoas} pessoa(s)</div><div>📅 ${formatarDataBrasileira(s.data)}</div><div>⏰ ${s.horarioInicio} às ${s.horarioFim}</div><div class="card-turno" style="background: ${turnoCor}20; color: ${turnoCor};">${s.turno === "Manhã" ? "🌅" : "🌙"} ${s.turno}</div></div><div class="card-descricao"><strong>📝 Descrição:</strong><br>${escapeHtml(s.descricao)}</div>${s.especificacoes ? `<div class="card-especificacoes"><strong>🔧 Especificações:</strong><br>${escapeHtml(s.especificacoes)}</div>` : ''}${anexoHTML ? `<div class="card-anexo">${anexoHTML}</div>` : ''}${dataPassada ? '<div class="card-expirada">📅 Data expirada</div>' : ''}`;
-    if (localStorage.getItem("role") === "admin") {
+    if (sessionStorage.getItem("role") === "admin") {
         const adminActions = document.createElement("div");
         adminActions.className = "card-actions";
         const select = document.createElement("select");
@@ -506,14 +506,16 @@ function fecharImagemModal() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    const el = document.getElementById("calendar");
-    if (!el) return;
-    const role = localStorage.getItem("role") || "user";
+    const role = sessionStorage.getItem("role") || "user";
     const badge = document.getElementById("userRoleBadge");
     if (badge) {
         badge.textContent = role === "admin" ? "👑 Admin" : "👤 Solicitante";
         badge.className = `user-badge ${role}`;
     }
+    
+    const el = document.getElementById("calendar");
+    if (!el) return;
+    
     const calendar = new FullCalendar.Calendar(el, {
         initialView: "dayGridMonth",
         locale: "pt-br",
