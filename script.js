@@ -26,14 +26,10 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, senha })
         });
-        const data = await res.json();
         if (res.ok) {
             mostrarToast("✅ Login realizado com sucesso!", "success");
-            localStorage.setItem("role", data.role);
-            localStorage.setItem("authToken", data.token);
-            setTimeout(() => {
-                window.location.href = "home.html";
-            }, 500);
+            sessionStorage.setItem("logado", "true");
+            window.location.href = "home.html";
         } else {
             mostrarToast("❌ Email ou senha inválidos", "error");
         }
@@ -47,11 +43,8 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
 
 function entrarSolicitante() {
     mostrarToast("✅ Entrando como solicitante...", "success");
-    localStorage.setItem("role", "user");
-    localStorage.removeItem("authToken");
-    setTimeout(() => {
-        window.location.href = "home.html";
-    }, 300);
+    sessionStorage.removeItem("logado");
+    window.location.href = "home.html";
 }
 
 document.getElementById("esqueciSenha").addEventListener("click", async (e) => {
