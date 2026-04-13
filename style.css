@@ -1009,10 +1009,17 @@ textarea {
     }
     .logout-btn { 
         margin: 0; 
-        width: 100%;
-        padding: 10px;
-        font-size: 13px;
-        order: 1;
+        width: calc(25% - 8px);
+        padding: 10px 8px;
+        font-size: 12px;
+        order: 0;
+    }
+    .sidebar-nav {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .nav-btn, .logout-btn {
+        flex: 1;
     }
     .content { 
         padding: 20px; 
@@ -1079,14 +1086,10 @@ textarea {
     .sidebar-nav {
         gap: 6px;
     }
-    .nav-btn {
+    .nav-btn, .logout-btn {
         min-width: calc(25% - 6px);
         padding: 8px 4px;
         font-size: 10px;
-    }
-    .logout-btn {
-        padding: 8px;
-        font-size: 12px;
     }
     .logo-img {
         width: 40px;
