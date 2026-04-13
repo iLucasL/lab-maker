@@ -589,7 +589,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             const disponivel = calendar.getEvents().some(e => e.startStr === date);
             if (!disponivel) {
-                mostrarToast("Data não disponível", "error");
+                mostrarToast("Data não disponível para agendamento", "error");
                 return;
             }
             abrirFormulario(date);
@@ -601,12 +601,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 mostrarToast("Não pode remover data passada", "error");
                 return;
             }
-            if (confirm(`Remover ${formatarDataBrasileira(data)}?`)) {
+            if (confirm(`Remover disponibilidade de ${formatarDataBrasileira(data)}?`)) {
                 mostrarLoadingGlobal(true);
                 fetch(`/eventos/${info.event.id}`, { method: "DELETE" })
                     .then(() => {
                         info.event.remove();
-                        mostrarToast("Removida", "success");
+                        mostrarToast("Disponibilidade removida", "success");
                     })
                     .catch(() => mostrarToast("Erro", "error"))
                     .finally(() => mostrarLoadingGlobal(false));
