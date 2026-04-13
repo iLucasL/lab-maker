@@ -142,11 +142,11 @@ function logout() {
 
 async function abrirFormulario(data) {
     if (isDataPassada(data)) {
-        mostrarToast("❌ Não é possível agendar em datas passadas!", "error");
+        mostrarToast("Não é possível agendar em datas passadas!", "error");
         return;
     }
     dataSelecionada = data;
-    document.getElementById("dataSelecionada").innerHTML = `<strong>📅 Data selecionada:</strong> ${formatarDataBrasileira(data)}`;
+    document.getElementById("dataSelecionada").innerHTML = `<strong>Data selecionada:</strong> ${formatarDataBrasileira(data)}`;
     const selectInicio = document.getElementById("horarioInicioSelect");
     const selectFim = document.getElementById("horarioFimSelect");
     selectInicio.innerHTML = '<option value="">Selecione o horário de início</option>';
@@ -177,7 +177,7 @@ async function abrirFormulario(data) {
             }
             const turno = getTurnoPorHorario(horarioInicio);
             if (!turno) {
-                mostrarToast("❌ Horário inválido!", "error");
+                mostrarToast("Horário inválido!", "error");
                 selectFim.innerHTML = '<option value="">Horário inválido</option>';
                 selectFim.disabled = true;
                 return;
@@ -269,7 +269,7 @@ function validarFormulario(dados) {
 
 async function enviarSolicitacao() {
     if (isDataPassada(dataSelecionada)) {
-        mostrarToast("❌ Data passada!", "error");
+        mostrarToast("Data passada!", "error");
         fecharModal();
         return;
     }
@@ -282,23 +282,23 @@ async function enviarSolicitacao() {
     const especificacoes = document.getElementById("especificacoes").value.trim();
     const file = document.getElementById("anexo").files[0];
     if (!horarioInicio || !horarioFim) {
-        mostrarToast("❌ Selecione início e término!", "error");
+        mostrarToast("Selecione início e término!", "error");
         return;
     }
     if (!descricao) {
-        mostrarToast("❌ Descreva sua solicitação!", "error");
+        mostrarToast("Descreva sua solicitação!", "error");
         return;
     }
     const turno = getTurnoPorHorario(horarioInicio);
     if (turno !== getTurnoPorHorario(horarioFim)) {
-        mostrarToast("❌ Não pode cruzar turnos!", "error");
+        mostrarToast("Não pode cruzar turnos!", "error");
         return;
     }
     mostrarLoadingGlobal(true);
     const disponibilidade = await verificarDisponibilidadeHorario(dataSelecionada, horarioInicio, horarioFim);
     mostrarLoadingGlobal(false);
     if (!disponibilidade.disponivel) {
-        mostrarToast(`❌ ${disponibilidade.motivo}`, "error");
+        mostrarToast(disponibilidade.motivo, "error");
         return;
     }
     const dadosBase = {
@@ -309,7 +309,7 @@ async function enviarSolicitacao() {
     };
     const erros = validarFormulario(dadosBase);
     if (erros.length > 0) {
-        mostrarToast("❌ " + erros[0], "error");
+        mostrarToast(erros[0], "error");
         return;
     }
     const btnEnviar = document.getElementById("btnEnviarSolicitacao");
@@ -319,16 +319,32 @@ async function enviarSolicitacao() {
     mostrarLoadingGlobal(true);
     if (file) {
         if (file.size > 10 * 1024 * 1024) {
-            mostrarToast("❌ Arquivo >10MB", "error");
+            mostrarToast("Arquivo muito grande (max 10MB)", "error");
             btnEnviar.disabled = false;
             btnEnviar.innerHTML = textoOriginal;
             mostrarLoadingGlobal(false);
             return;
         }
         const reader = new FileReader();
-        reader.onload = () => send({ ...dadosBase, anexo: reader.result }, btnEnviar, textoOriginal);
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            let anexoDados = {};
+            if (file.type === "application/pdf") {
+                anexoDados = {
+                    anexo: base64,
+                    anexoTipo: "pdf",
+                    anexoNome: file.name
+                };
+            } else {
+                anexoDados = {
+                    anexo: base64,
+                    anexoTipo: "imagem"
+                };
+            }
+            send({ ...dadosBase, ...anexoDados }, btnEnviar, textoOriginal);
+        };
         reader.onerror = () => {
-            mostrarToast("❌ Erro no arquivo", "error");
+            mostrarToast("Erro ao ler arquivo", "error");
             btnEnviar.disabled = false;
             btnEnviar.innerHTML = textoOriginal;
             mostrarLoadingGlobal(false);
@@ -353,13 +369,13 @@ function send(data, btnEnviar, textoOriginal) {
         return response.json();
     })
     .then(() => {
-        mostrarToast("✅ Solicitação enviada com sucesso!", "success");
+        mostrarToast("Solicitação enviada com sucesso!", "success");
         fecharModal();
         if (document.getElementById("solicitacoes").classList.contains("active")) {
             carregarSolicitacoes();
         }
     })
-    .catch(error => mostrarToast(`❌ ${error.message}`, "error"))
+    .catch(error => mostrarToast(error.message, "error"))
     .finally(() => {
         btnEnviar.disabled = false;
         btnEnviar.innerHTML = textoOriginal;
@@ -370,22 +386,22 @@ function send(data, btnEnviar, textoOriginal) {
 function carregarSolicitacoes() {
     const container = document.getElementById("solicitacoesList");
     if (!container) return;
-    container.innerHTML = '<div class="loading-cards">🔄 Carregando...</div>';
+    container.innerHTML = '<div class="loading-cards">Carregando...</div>';
     fetch("/solicitacoes")
         .then(r => r.json())
         .then(data => {
             if (!container) return;
             container.innerHTML = "";
             if (data.length === 0) {
-                container.innerHTML = '<div class="empty-state">📭 Nenhuma solicitação encontrada</div>';
+                container.innerHTML = '<div class="empty-state">Nenhuma solicitação encontrada</div>';
                 return;
             }
             data.sort((a, b) => new Date(b.data) - new Date(a.data));
             const colunas = [
-                { id: "recebido", titulo: "📥 Recebido", cor: "#f1c40f" },
-                { id: "analise", titulo: "🔍 Em análise", cor: "#3498db" },
-                { id: "fazendo", titulo: "⚙️ Em andamento", cor: "#e67e22" },
-                { id: "concluido", titulo: "✅ Concluído", cor: "#2ecc71" }
+                { id: "recebido", titulo: "Recebido", cor: "#f1c40f" },
+                { id: "analise", titulo: "Em análise", cor: "#3498db" },
+                { id: "fazendo", titulo: "Em andamento", cor: "#e67e22" },
+                { id: "concluido", titulo: "Concluído", cor: "#2ecc71" }
             ];
             const kanbanGrid = document.createElement("div");
             kanbanGrid.className = "kanban-grid";
@@ -404,7 +420,7 @@ function carregarSolicitacoes() {
         })
         .catch(error => {
             console.error("Erro:", error);
-            container.innerHTML = '<div class="error-state">❌ Erro ao carregar solicitações</div>';
+            container.innerHTML = '<div class="error-state">Erro ao carregar solicitações</div>';
         });
 }
 
@@ -421,19 +437,24 @@ function criarCardSolicitacao(s) {
     if (s.turno === "Noite") turnoCor = "#9b59b6";
     let anexoHTML = "";
     if (s.anexo) {
-        if (s.anexo.startsWith("data:application/pdf")) {
-            anexoHTML = `<a href="${s.anexo}" target="_blank" class="card-anexo-link">📄 PDF</a>`;
-        } else {
-            anexoHTML = `<img src="${s.anexo}" onclick="abrirImagem('${s.anexo}')" class="card-anexo-img">`;
+        if (s.anexo.tipo === "pdf") {
+            anexoHTML = `
+                <div class="card-anexo-buttons">
+                    <a href="${s.anexo.caminho}" target="_blank" class="card-anexo-link">Visualizar PDF</a>
+                    <a href="${s.anexo.caminho}" download="${s.anexo.nome}" class="card-anexo-link">Baixar PDF</a>
+                </div>
+            `;
+        } else if (s.anexo.tipo === "imagem") {
+            anexoHTML = `<img src="${s.anexo.dados}" onclick="abrirImagem('${s.anexo.dados}')" class="card-anexo-img">`;
         }
     }
-    div.innerHTML = `<div class="card-id">#${s.id}</div><div class="card-title">${escapeHtml(s.nome)}</div><div class="card-details"><div>📞 ${escapeHtml(s.celular)}</div><div>👥 ${s.pessoas} pessoa(s)</div><div>📅 ${formatarDataBrasileira(s.data)}</div><div>⏰ ${s.horarioInicio} às ${s.horarioFim}</div><div class="card-turno" style="background: ${turnoCor}20; color: ${turnoCor};">${s.turno === "Manhã" ? "🌅" : "🌙"} ${s.turno}</div></div><div class="card-descricao"><strong>📝 Descrição:</strong><br>${escapeHtml(s.descricao)}</div>${s.especificacoes ? `<div class="card-especificacoes"><strong>🔧 Especificações:</strong><br>${escapeHtml(s.especificacoes)}</div>` : ''}${anexoHTML ? `<div class="card-anexo">${anexoHTML}</div>` : ''}${dataPassada ? '<div class="card-expirada">📅 Data expirada</div>' : ''}`;
+    div.innerHTML = `<div class="card-id">#${s.id}</div><div class="card-title">${escapeHtml(s.nome)}</div><div class="card-details"><div>${escapeHtml(s.celular)}</div><div>${s.pessoas} pessoa(s)</div><div>${formatarDataBrasileira(s.data)}</div><div>${s.horarioInicio} as ${s.horarioFim}</div><div class="card-turno" style="background: ${turnoCor}20; color: ${turnoCor};">${s.turno === "Manhã" ? "Manhã" : s.turno === "Tarde" ? "Tarde" : "Noite"}</div></div><div class="card-descricao"><strong>Descrição:</strong><br>${escapeHtml(s.descricao)}</div>${s.especificacoes ? `<div class="card-especificacoes"><strong>Especificações:</strong><br>${escapeHtml(s.especificacoes)}</div>` : ''}${anexoHTML ? `<div class="card-anexo">${anexoHTML}</div>` : ''}${dataPassada ? '<div class="card-expirada">Data expirada</div>' : ''}`;
     if (sessionStorage.getItem("role") === "admin") {
         const adminActions = document.createElement("div");
         adminActions.className = "card-actions";
         const select = document.createElement("select");
         select.className = "card-status-select";
-        select.innerHTML = `<option value="recebido" ${s.status === "recebido" ? "selected" : ""}>📥 Recebido</option><option value="analise" ${s.status === "analise" ? "selected" : ""}>🔍 Análise</option><option value="fazendo" ${s.status === "fazendo" ? "selected" : ""}>⚙️ Fazendo</option><option value="concluido" ${s.status === "concluido" ? "selected" : ""}>✅ Concluído</option>`;
+        select.innerHTML = `<option value="recebido" ${s.status === "recebido" ? "selected" : ""}>Recebido</option><option value="analise" ${s.status === "analise" ? "selected" : ""}>Análise</option><option value="fazendo" ${s.status === "fazendo" ? "selected" : ""}>Fazendo</option><option value="concluido" ${s.status === "concluido" ? "selected" : ""}>Concluído</option>`;
         select.onchange = function() {
             const novoStatus = this.value;
             const statusText = this.options[this.selectedIndex].text;
@@ -445,11 +466,11 @@ function criarCardSolicitacao(s) {
                 body: JSON.stringify({ id: s.id, status: novoStatus })
             })
             .then(() => {
-                mostrarToast(`✅ Status: ${statusText}`, "success");
+                mostrarToast(`Status: ${statusText}`, "success");
                 carregarSolicitacoes();
             })
             .catch(() => {
-                mostrarToast("❌ Erro", "error");
+                mostrarToast("Erro", "error");
                 this.value = s.status;
                 this.disabled = false;
             })
@@ -457,21 +478,21 @@ function criarCardSolicitacao(s) {
         };
         const delBtn = document.createElement("button");
         delBtn.className = "card-delete-btn";
-        delBtn.innerHTML = "🗑️ Excluir";
+        delBtn.innerHTML = "Excluir";
         delBtn.onclick = () => {
             if (confirm("Excluir esta solicitação?")) {
                 delBtn.disabled = true;
-                delBtn.innerHTML = "⏳";
+                delBtn.innerHTML = "...";
                 mostrarLoadingGlobal(true);
                 fetch(`/solicitacoes/${s.id}`, { method: "DELETE" })
                     .then(() => {
-                        mostrarToast("✅ Excluída", "success");
+                        mostrarToast("Excluída", "success");
                         carregarSolicitacoes();
                     })
                     .catch(() => {
-                        mostrarToast("❌ Erro", "error");
+                        mostrarToast("Erro", "error");
                         delBtn.disabled = false;
-                        delBtn.innerHTML = "🗑️ Excluir";
+                        delBtn.innerHTML = "Excluir";
                     })
                     .finally(() => mostrarLoadingGlobal(false));
             }
@@ -509,7 +530,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const role = sessionStorage.getItem("role") || "user";
     const badge = document.getElementById("userRoleBadge");
     if (badge) {
-        badge.textContent = role === "admin" ? "👑 Admin" : "👤 Solicitante";
+        badge.textContent = role === "admin" ? "Admin" : "Solicitante";
         badge.className = `user-badge ${role}`;
     }
     
@@ -541,13 +562,13 @@ document.addEventListener("DOMContentLoaded", function () {
         dateClick: function(info) {
             const date = info.dateStr;
             if (isDataPassada(date)) {
-                mostrarToast("❌ Data passada!", "error");
+                mostrarToast("Data passada!", "error");
                 return;
             }
             if (role === "admin") {
                 const jaExiste = calendar.getEvents().some(e => e.startStr === date);
                 if (jaExiste) {
-                    mostrarToast("⚠️ Já disponível", "warning");
+                    mostrarToast("Já disponível", "warning");
                     return;
                 }
                 if (confirm(`Marcar ${formatarDataBrasileira(date)} como DISPONÍVEL?`)) {
@@ -559,16 +580,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     })
                     .then(() => {
                         calendar.refetchEvents();
-                        mostrarToast("✅ Data disponível!", "success");
+                        mostrarToast("Data disponível!", "success");
                     })
-                    .catch(() => mostrarToast("❌ Erro", "error"))
+                    .catch(() => mostrarToast("Erro", "error"))
                     .finally(() => mostrarLoadingGlobal(false));
                 }
                 return;
             }
             const disponivel = calendar.getEvents().some(e => e.startStr === date);
             if (!disponivel) {
-                mostrarToast("⚠️ Data não disponível", "error");
+                mostrarToast("Data não disponível", "error");
                 return;
             }
             abrirFormulario(date);
@@ -577,7 +598,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (role !== "admin") return;
             const data = info.event.startStr;
             if (isDataPassada(data)) {
-                mostrarToast("❌ Não pode remover data passada", "error");
+                mostrarToast("Não pode remover data passada", "error");
                 return;
             }
             if (confirm(`Remover ${formatarDataBrasileira(data)}?`)) {
@@ -585,9 +606,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 fetch(`/eventos/${info.event.id}`, { method: "DELETE" })
                     .then(() => {
                         info.event.remove();
-                        mostrarToast("✅ Removida", "success");
+                        mostrarToast("Removida", "success");
                     })
-                    .catch(() => mostrarToast("❌ Erro", "error"))
+                    .catch(() => mostrarToast("Erro", "error"))
                     .finally(() => mostrarLoadingGlobal(false));
             }
         }
