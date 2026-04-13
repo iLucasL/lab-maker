@@ -43,7 +43,6 @@ function verificarConflito(ag1, ag2) {
 
 app.post("/login-admin", (req, res) => {
     const { email, senha } = req.body;
-    
     try {
         const admin = JSON.parse(fs.readFileSync(adminFile));
         if (email === admin.email && senha === admin.senha) {
@@ -56,34 +55,30 @@ app.post("/login-admin", (req, res) => {
             return res.json({ ok: true, role: "admin" });
         }
     }
-    
-    res.status(400).json({ erro: "Email ou senha inválidos" });
+    res.status(400).json({ erro: "Email ou senha invalidos" });
 });
 
 app.post("/redefinir-senha", (req, res) => {
     const { email, novaSenha } = req.body;
-    
     if (email !== "admin@lab.com") {
-        return res.status(400).json({ erro: "Email não cadastrado no sistema" });
+        return res.status(400).json({ erro: "Email nao cadastrado" });
     }
-    
     if (!novaSenha || novaSenha.length < 3) {
-        return res.status(400).json({ erro: "A nova senha deve ter pelo menos 3 caracteres" });
+        return res.status(400).json({ erro: "Minimo 3 caracteres" });
     }
-    
     try {
-        const admin = JSON.parse(fs.readFileSync(adminFile));
-        admin.senha = novaSenha;
+        const admin = { email: "admin@lab.com", senha: novaSenha };
         fs.writeFileSync(adminFile, JSON.stringify(admin, null, 2));
-        return res.json({ ok: true, mensagem: "Senha atualizada com sucesso!" });
+        return res.json({ ok: true, mensagem: "Senha atualizada!" });
     } catch (error) {
-        return res.status(500).json({ erro: "Erro interno ao salvar senha" });
+        return res.status(500).json({ erro: "Erro interno" });
     }
 });
 
 app.get("/eventos", (req, res) => {
     try {
-        res.json(JSON.parse(fs.readFileSync(eventosFile)));
+        const dados = JSON.parse(fs.readFileSync(eventosFile));
+        res.json(dados);
     } catch (error) {
         res.json([]);
     }
@@ -92,10 +87,10 @@ app.get("/eventos", (req, res) => {
 app.post("/eventos", (req, res) => {
     const { start } = req.body;
     if (isDataPassada(start)) {
-        return res.status(400).json({ erro: "Não é possível marcar datas passadas" });
+        return res.status(400).json({ erro: "Data passada" });
     }
     const list = JSON.parse(fs.readFileSync(eventosFile));
-    const novo = { id: Date.now(), title: "Disponível", start: start };
+    const novo = { id: Date.now(), title: "Disponivel", start: start };
     list.push(novo);
     fs.writeFileSync(eventosFile, JSON.stringify(list, null, 2));
     res.json(novo);
@@ -110,7 +105,8 @@ app.delete("/eventos/:id", (req, res) => {
 
 app.get("/solicitacoes", (req, res) => {
     try {
-        res.json(JSON.parse(fs.readFileSync(solFile)));
+        const dados = JSON.parse(fs.readFileSync(solFile));
+        res.json(dados);
     } catch (error) {
         res.json([]);
     }
@@ -119,7 +115,7 @@ app.get("/solicitacoes", (req, res) => {
 app.post("/solicitacoes", (req, res) => {
     const { data, horarioInicio, horarioFim } = req.body;
     if (isDataPassada(data)) {
-        return res.status(400).json({ erro: "Data passada não pode" });
+        return res.status(400).json({ erro: "Data passada" });
     }
     const solicitacoesExistentes = JSON.parse(fs.readFileSync(solFile));
     const solicitacoesMesmaData = solicitacoesExistentes.filter(s => s.data === data);
@@ -129,7 +125,7 @@ app.post("/solicitacoes", (req, res) => {
         return verificarConflito(novoAgendamento, existente);
     });
     if (temConflito) {
-        return res.status(400).json({ erro: "Horário conflita com outro" });
+        return res.status(400).json({ erro: "Horario conflitante" });
     }
     const list = JSON.parse(fs.readFileSync(solFile));
     list.push({ id: Date.now(), ...req.body, status: "recebido" });
@@ -163,5 +159,5 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`✅ Servidor rodando na porta ${PORT}`);
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
