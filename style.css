@@ -1010,10 +1010,13 @@ textarea {
         white-space: nowrap;
     }
     .content { 
-        padding: 20px; 
+        padding: 16px; 
     }
     .page-header h1 { 
-        font-size: 24px; 
+        font-size: 22px; 
+    }
+    .page-header {
+        margin-bottom: 16px;
     }
     .kanban-grid { 
         flex-direction: column; 
@@ -1025,9 +1028,57 @@ textarea {
     }
     .kanban-cards { 
         max-height: none; 
-        display: grid;
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
         gap: 12px;
+        padding: 12px;
+    }
+    .kanban-card {
+        padding: 12px;
+        margin-bottom: 0;
+    }
+    .card-id {
+        font-size: 9px;
+        margin-bottom: 6px;
+    }
+    .card-title {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+    .card-details {
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
+    .card-details > div {
+        margin: 3px 0;
+    }
+    .card-turno {
+        font-size: 9px;
+        padding: 2px 8px;
+        margin-top: 4px;
+    }
+    .card-descricao {
+        font-size: 11px;
+        margin-top: 8px;
+        padding-top: 8px;
+    }
+    .card-especificacoes {
+        font-size: 11px;
+        padding: 8px;
+        margin-top: 8px;
+    }
+    .card-actions {
+        margin-top: 10px;
+        padding-top: 8px;
+        gap: 8px;
+    }
+    .card-status-select {
+        padding: 6px;
+        font-size: 10px;
+    }
+    .card-delete-btn {
+        padding: 6px;
+        font-size: 10px;
     }
     .horario-container { 
         flex-direction: column; 
@@ -1084,13 +1135,37 @@ textarea {
         padding: 4px 12px;
     }
     .content {
-        padding: 16px;
+        padding: 12px;
     }
     .page-header h1 {
         font-size: 20px;
     }
     .subtitle {
-        font-size: 12px;
+        font-size: 11px;
+    }
+    .kanban-card {
+        padding: 10px;
+    }
+    .card-title {
+        font-size: 13px;
+    }
+    .card-details {
+        font-size: 10px;
+    }
+    .card-descricao {
+        font-size: 10px;
+    }
+    .card-especificacoes {
+        font-size: 10px;
+        padding: 6px;
+    }
+    .card-status-select {
+        padding: 5px;
+        font-size: 9px;
+    }
+    .card-delete-btn {
+        padding: 5px;
+        font-size: 9px;
     }
     .modal-header h2 {
         font-size: 18px;
@@ -1111,15 +1186,6 @@ textarea {
     .btn-primary, .btn-secondary {
         padding: 10px;
         font-size: 13px;
-    }
-    .kanban-card {
-        padding: 12px;
-    }
-    .card-title {
-        font-size: 14px;
-    }
-    .card-details {
-        font-size: 11px;
     }
 }
 
