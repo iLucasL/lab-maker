@@ -11,9 +11,11 @@ app.use(express.static(__dirname));
 const eventosFile = path.join(__dirname, "eventos.json");
 const solFile = path.join(__dirname, "solicitacoes.json");
 const adminFile = path.join(__dirname, "admin.json");
+const uploadsDir = path.join(__dirname, "uploads");
 
 if (!fs.existsSync(eventosFile)) fs.writeFileSync(eventosFile, "[]");
 if (!fs.existsSync(solFile)) fs.writeFileSync(solFile, "[]");
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
 
 if (!fs.existsSync(adminFile)) {
     const adminPadrao = { email: "admin@lab.com", senha: "123" };
@@ -113,7 +115,7 @@ app.get("/solicitacoes", (req, res) => {
 });
 
 app.post("/solicitacoes", (req, res) => {
-    const { data, horarioInicio, horarioFim } = req.body;
+    const { data, horarioInicio, horarioFim, anexo, anexoTipo, anexoNome } = req.body;
     if (isDataPassada(data)) {
         return res.status(400).json({ erro: "Data passada" });
     }
@@ -128,7 +130,21 @@ app.post("/solicitacoes", (req, res) => {
         return res.status(400).json({ erro: "Horario conflitante" });
     }
     const list = JSON.parse(fs.readFileSync(solFile));
-    list.push({ id: Date.now(), ...req.body, status: "recebido" });
+    
+    let anexoData = null;
+    if (anexo) {
+        if (anexoTipo === "pdf") {
+            const fileName = `anexo_${Date.now()}.pdf`;
+            const filePath = path.join(uploadsDir, fileName);
+            const base64Data = anexo.replace(/^data:application\/pdf;base64,/, "");
+            fs.writeFileSync(filePath, base64Data, 'base64');
+            anexoData = { tipo: "pdf", caminho: `/uploads/${fileName}`, nome: anexoNome || "documento.pdf" };
+        } else {
+            anexoData = { tipo: "imagem", dados: anexo };
+        }
+    }
+    
+    list.push({ id: Date.now(), ...req.body, anexo: anexoData, status: "recebido" });
     fs.writeFileSync(solFile, JSON.stringify(list, null, 2));
     res.json({ ok: true });
 });
@@ -156,6 +172,8 @@ app.delete("/solicitacoes/:id", (req, res) => {
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
 });
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
