@@ -865,23 +865,23 @@ textarea {
 .faq-category {
     background: var(--bg-card);
     border-radius: var(--radius-lg);
-    padding: 20px;
-    margin-bottom: 24px;
+    padding: 16px;
+    margin-bottom: 20px;
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border-color);
 }
 
 .faq-category h2 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 16px;
-    padding-bottom: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
     border-bottom: 2px solid var(--primary-light);
 }
 
 .faq-item {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     overflow: hidden;
@@ -889,13 +889,13 @@ textarea {
 
 .faq-question {
     background: var(--bg-content);
-    padding: 14px 16px;
+    padding: 10px 14px;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text-primary);
     transition: var(--transition);
 }
@@ -906,7 +906,7 @@ textarea {
 
 .faq-icon {
     transition: transform 0.2s ease;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-light);
 }
 
@@ -915,7 +915,7 @@ textarea {
 }
 
 .faq-answer {
-    padding: 0 16px;
+    padding: 0 14px;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease, padding 0.3s ease;
@@ -923,15 +923,15 @@ textarea {
 }
 
 .faq-item.active .faq-answer {
-    padding: 14px 16px;
-    max-height: 300px;
+    padding: 10px 14px;
+    max-height: 200px;
 }
 
 .faq-answer p {
     margin: 0;
-    line-height: 1.6;
+    line-height: 1.5;
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .empty-state, .loading-cards, .error-state {
@@ -946,8 +946,23 @@ textarea {
 
 .error-state { color: var(--danger); }
 
+@media (max-width: 992px) {
+    .content {
+        padding: 24px;
+    }
+    .kanban-grid {
+        gap: 16px;
+        min-width: 720px;
+    }
+    .kanban-coluna {
+        min-width: 220px;
+    }
+}
+
 @media (max-width: 768px) {
-    .layout { flex-direction: column; }
+    .layout { 
+        flex-direction: column; 
+    }
     .sidebar {
         width: 100%;
         flex-direction: row;
@@ -956,30 +971,157 @@ textarea {
         justify-content: space-between;
         padding: 12px 20px;
     }
-    .logo-area { padding: 0; border-bottom: none; }
-    .logo-container { margin-bottom: 0; }
-    .logo-img { width: 40px; height: 40px; }
-    .user-badge { width: auto; margin-top: 0; }
-    .sidebar-nav { flex-direction: row; padding: 0; gap: 8px; }
-    .nav-btn { width: auto; padding: 8px 14px; font-size: 12px; }
-    .logout-btn { margin: 0; width: auto; padding: 8px 16px; }
-    .content { padding: 20px; }
-    .page-header h1 { font-size: 24px; }
-    .kanban-grid { flex-direction: column; min-width: auto; gap: 16px; }
-    .kanban-coluna { min-width: auto; }
-    .kanban-cards { max-height: none; }
-    .horario-container { flex-direction: column; gap: 12px; }
-    .modal-content { width: 95%; margin: 20px; }
-    .theme-toggle { width: 40px; height: 40px; font-size: 18px; bottom: 16px; right: 16px; }
-    .logo-icon { width: 70px; height: 70px; }
+    .logo-area { 
+        padding: 0; 
+        border-bottom: none; 
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .logo-container { 
+        margin-bottom: 0; 
+    }
+    .logo-img { 
+        width: 40px; 
+        height: 40px; 
+    }
+    .user-badge { 
+        width: auto; 
+        margin-top: 0; 
+    }
+    .sidebar-nav { 
+        flex-direction: row; 
+        padding: 0; 
+        gap: 8px; 
+    }
+    .nav-btn { 
+        width: auto; 
+        padding: 8px 14px; 
+        font-size: 12px; 
+    }
+    .logout-btn { 
+        margin: 0; 
+        width: auto; 
+        padding: 8px 16px; 
+    }
+    .content { 
+        padding: 20px; 
+    }
+    .page-header h1 { 
+        font-size: 24px; 
+    }
+    .kanban-grid { 
+        flex-direction: column; 
+        min-width: auto; 
+        gap: 16px; 
+    }
+    .kanban-coluna { 
+        min-width: auto; 
+    }
+    .kanban-cards { 
+        max-height: none; 
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .horario-container { 
+        flex-direction: column; 
+        gap: 12px; 
+    }
+    .modal-content { 
+        width: 95%; 
+        margin: 20px; 
+    }
+    .theme-toggle { 
+        width: 40px; 
+        height: 40px; 
+        font-size: 18px; 
+        bottom: 16px; 
+        right: 16px; 
+    }
+    .logo-icon { 
+        width: 70px; 
+        height: 70px; 
+    }
+    .faq-container {
+        margin: 0 10px;
+    }
+    .faq-category {
+        padding: 12px;
+        margin-bottom: 16px;
+    }
+    .faq-category h2 {
+        font-size: 15px;
+    }
+    .faq-question {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    .faq-item.active .faq-answer {
+        padding: 8px 12px;
+    }
+    .faq-answer p {
+        font-size: 11px;
+    }
 }
 
 @media (max-width: 480px) {
-    .sidebar-nav { flex-wrap: wrap; }
-    .nav-btn { font-size: 11px; padding: 6px 10px; }
-    .kanban-card { padding: 12px; }
-    .logo-icon { width: 60px; height: 60px; }
-    .logo-img { width: 35px; height: 35px; }
+    .sidebar {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+    .logo-area {
+        justify-content: center;
+    }
+    .sidebar-nav {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .nav-btn { 
+        font-size: 11px; 
+        padding: 6px 10px; 
+    }
+    .kanban-card { 
+        padding: 12px; 
+    }
+    .logo-icon { 
+        width: 60px; 
+        height: 60px; 
+    }
+    .logo-img { 
+        width: 35px; 
+        height: 35px; 
+    }
+    .content {
+        padding: 16px;
+    }
+    .page-header h1 {
+        font-size: 20px;
+    }
+    .subtitle {
+        font-size: 12px;
+    }
+    .modal-header h2 {
+        font-size: 18px;
+    }
+    .modal-header {
+        padding: 16px 20px;
+    }
+    .modal-body {
+        padding: 20px;
+    }
+    .form-group label {
+        font-size: 12px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    .btn-primary, .btn-secondary {
+        padding: 10px;
+        font-size: 13px;
+    }
 }
 
 button:disabled {
