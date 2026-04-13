@@ -995,16 +995,16 @@ textarea {
     .sidebar-nav { 
         flex-direction: row; 
         padding: 0; 
-        gap: 10px; 
+        gap: 8px; 
         justify-content: center;
         flex-wrap: wrap;
     }
     .nav-btn { 
         flex: 1;
-        min-width: calc(33% - 10px);
+        min-width: calc(25% - 8px);
         text-align: center;
         padding: 10px 8px;
-        font-size: 13px;
+        font-size: 12px;
         justify-content: center;
     }
     .logout-btn { 
@@ -1012,6 +1012,7 @@ textarea {
         width: 100%;
         padding: 10px;
         font-size: 13px;
+        order: 1;
     }
     .content { 
         padding: 20px; 
@@ -1076,22 +1077,20 @@ textarea {
 
 @media (max-width: 480px) {
     .sidebar-nav {
-        flex-direction: column;
-        gap: 8px;
+        gap: 6px;
     }
     .nav-btn {
-        min-width: 100%;
-        text-align: center;
-        padding: 10px;
-        font-size: 14px;
+        min-width: calc(25% - 6px);
+        padding: 8px 4px;
+        font-size: 10px;
     }
     .logout-btn {
-        padding: 10px;
-        font-size: 14px;
+        padding: 8px;
+        font-size: 12px;
     }
     .logo-img {
-        width: 45px;
-        height: 45px;
+        width: 40px;
+        height: 40px;
     }
     .user-badge {
         font-size: 10px;
