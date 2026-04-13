@@ -14,7 +14,11 @@ const adminFile = path.join(__dirname, "admin.json");
 
 if (!fs.existsSync(eventosFile)) fs.writeFileSync(eventosFile, "[]");
 if (!fs.existsSync(solFile)) fs.writeFileSync(solFile, "[]");
-if (!fs.existsSync(adminFile)) fs.writeFileSync(adminFile, JSON.stringify({ email: "admin@lab.com", senha: "123" }));
+
+if (!fs.existsSync(adminFile)) {
+    const adminPadrao = { email: "admin@lab.com", senha: "123" };
+    fs.writeFileSync(adminFile, JSON.stringify(adminPadrao, null, 2));
+}
 
 function isDataPassada(dataISO) {
     const hoje = new Date();
@@ -39,29 +43,50 @@ function verificarConflito(ag1, ag2) {
 
 app.post("/login-admin", (req, res) => {
     const { email, senha } = req.body;
-    const admin = JSON.parse(fs.readFileSync(adminFile));
-    if (email === admin.email && senha === admin.senha) {
-        return res.json({ ok: true, role: "admin" });
+    
+    try {
+        const admin = JSON.parse(fs.readFileSync(adminFile));
+        if (email === admin.email && senha === admin.senha) {
+            return res.json({ ok: true, role: "admin" });
+        }
+    } catch (error) {
+        const adminPadrao = { email: "admin@lab.com", senha: "123" };
+        fs.writeFileSync(adminFile, JSON.stringify(adminPadrao, null, 2));
+        if (email === adminPadrao.email && senha === adminPadrao.senha) {
+            return res.json({ ok: true, role: "admin" });
+        }
     }
-    res.status(400).json({ erro: "inválido" });
+    
+    res.status(400).json({ erro: "Email ou senha inválidos" });
 });
 
 app.post("/redefinir-senha", (req, res) => {
     const { email, novaSenha } = req.body;
-    const admin = JSON.parse(fs.readFileSync(adminFile));
     
-    if (email === admin.email) {
-        admin.senha = novaSenha;
-        fs.writeFileSync(adminFile, JSON.stringify(admin, null, 2));
-        console.log(`✅ Senha alterada com sucesso para ${email}`);
-        return res.json({ ok: true, mensagem: "Senha atualizada!" });
+    if (email !== "admin@lab.com") {
+        return res.status(400).json({ erro: "Email não cadastrado no sistema" });
     }
     
-    res.status(400).json({ erro: "Email não encontrado" });
+    if (!novaSenha || novaSenha.length < 3) {
+        return res.status(400).json({ erro: "A nova senha deve ter pelo menos 3 caracteres" });
+    }
+    
+    try {
+        const admin = JSON.parse(fs.readFileSync(adminFile));
+        admin.senha = novaSenha;
+        fs.writeFileSync(adminFile, JSON.stringify(admin, null, 2));
+        return res.json({ ok: true, mensagem: "Senha atualizada com sucesso!" });
+    } catch (error) {
+        return res.status(500).json({ erro: "Erro interno ao salvar senha" });
+    }
 });
 
 app.get("/eventos", (req, res) => {
-    res.json(JSON.parse(fs.readFileSync(eventosFile)));
+    try {
+        res.json(JSON.parse(fs.readFileSync(eventosFile)));
+    } catch (error) {
+        res.json([]);
+    }
 });
 
 app.post("/eventos", (req, res) => {
@@ -84,7 +109,11 @@ app.delete("/eventos/:id", (req, res) => {
 });
 
 app.get("/solicitacoes", (req, res) => {
-    res.json(JSON.parse(fs.readFileSync(solFile)));
+    try {
+        res.json(JSON.parse(fs.readFileSync(solFile)));
+    } catch (error) {
+        res.json([]);
+    }
 });
 
 app.post("/solicitacoes", (req, res) => {
