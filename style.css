@@ -794,6 +794,26 @@ textarea {
     transform: translateY(-1px);
 }
 
+.card-anexo-img {
+    max-width: 100%;
+    max-height: 150px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    object-fit: cover;
+    margin-top: 8px;
+}
+
+.card-anexo-link {
+    display: inline-block;
+    padding: 4px 8px;
+    background: var(--info);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    margin-top: 8px;
+}
+
 .global-loading {
     position: fixed;
     top: 0;
@@ -1080,6 +1100,18 @@ textarea {
         padding: 6px;
         font-size: 10px;
     }
+    .card-anexo-img {
+        max-height: 100px;
+        width: auto;
+        max-width: 100%;
+    }
+    .card-anexo-link {
+        font-size: 10px;
+        padding: 4px 8px;
+        white-space: nowrap;
+        overflow-x: auto;
+        max-width: 100%;
+    }
     .horario-container { 
         flex-direction: column; 
         gap: 12px; 
@@ -1166,6 +1198,15 @@ textarea {
     .card-delete-btn {
         padding: 5px;
         font-size: 9px;
+    }
+    .card-anexo-img {
+        max-height: 80px;
+    }
+    .card-anexo-link {
+        font-size: 9px;
+        padding: 3px 6px;
+        white-space: normal;
+        word-break: break-all;
     }
     .modal-header h2 {
         font-size: 18px;
