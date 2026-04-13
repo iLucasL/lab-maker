@@ -10,9 +10,11 @@ app.use(express.static(__dirname));
 
 const eventosFile = path.join(__dirname, "eventos.json");
 const solFile = path.join(__dirname, "solicitacoes.json");
+const adminFile = path.join(__dirname, "admin.json");
 
 if (!fs.existsSync(eventosFile)) fs.writeFileSync(eventosFile, "[]");
 if (!fs.existsSync(solFile)) fs.writeFileSync(solFile, "[]");
+if (!fs.existsSync(adminFile)) fs.writeFileSync(adminFile, JSON.stringify({ email: "admin@lab.com", senha: "123" }));
 
 function isDataPassada(dataISO) {
     const hoje = new Date();
@@ -37,7 +39,8 @@ function verificarConflito(ag1, ag2) {
 
 app.post("/login-admin", (req, res) => {
     const { email, senha } = req.body;
-    if (email === "admin@lab.com" && senha === "123") {
+    const admin = JSON.parse(fs.readFileSync(adminFile));
+    if (email === admin.email && senha === admin.senha) {
         return res.json({ ok: true, role: "admin" });
     }
     res.status(400).json({ erro: "inválido" });
@@ -45,8 +48,16 @@ app.post("/login-admin", (req, res) => {
 
 app.post("/redefinir-senha", (req, res) => {
     const { email, novaSenha } = req.body;
-    console.log(`Senha redefinida para ${email}: ${novaSenha}`);
-    res.json({ ok: true });
+    const admin = JSON.parse(fs.readFileSync(adminFile));
+    
+    if (email === admin.email) {
+        admin.senha = novaSenha;
+        fs.writeFileSync(adminFile, JSON.stringify(admin, null, 2));
+        console.log(`✅ Senha alterada com sucesso para ${email}`);
+        return res.json({ ok: true, mensagem: "Senha atualizada!" });
+    }
+    
+    res.status(400).json({ erro: "Email não encontrado" });
 });
 
 app.get("/eventos", (req, res) => {
