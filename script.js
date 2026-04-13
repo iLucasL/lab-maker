@@ -32,7 +32,7 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
             sessionStorage.setItem("role", "admin");
             window.location.href = "home.html";
         } else {
-            mostrarToast("❌ Email ou senha inválidos", "error");
+            mostrarToast("❌ " + (data.erro || "Email ou senha inválidos"), "error");
         }
     } catch (err) {
         mostrarToast("❌ Erro ao conectar ao servidor", "error");
@@ -50,12 +50,20 @@ function entrarSolicitante() {
 
 document.getElementById("esqueciSenha").addEventListener("click", async (e) => {
     e.preventDefault();
-    const email = prompt("Digite seu email cadastrado (admin@lab.com):");
+    
+    const email = prompt("Digite seu email cadastrado:");
     if (!email) return;
     
+    if (email !== "admin@lab.com") {
+        mostrarToast("❌ Email não cadastrado no sistema!", "error");
+        return;
+    }
+    
     const novaSenha = prompt("Digite a nova senha (mínimo 3 caracteres):");
-    if (!novaSenha || novaSenha.length < 3) {
-        mostrarToast("Senha deve ter pelo menos 3 caracteres", "error");
+    if (!novaSenha) return;
+    
+    if (novaSenha.length < 3) {
+        mostrarToast("❌ A senha deve ter pelo menos 3 caracteres", "error");
         return;
     }
     
@@ -71,10 +79,10 @@ document.getElementById("esqueciSenha").addEventListener("click", async (e) => {
         if (res.ok) {
             mostrarToast("✅ " + data.mensagem, "success");
         } else {
-            mostrarToast("❌ " + data.erro, "error");
+            mostrarToast("❌ " + (data.erro || "Erro ao redefinir senha"), "error");
         }
     } catch (err) {
-        mostrarToast("❌ Erro ao redefinir senha", "error");
+        mostrarToast("❌ Erro ao conectar ao servidor", "error");
     }
 });
 
