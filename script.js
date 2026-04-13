@@ -17,7 +17,7 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
     }
     const btn = document.getElementById("btnLogin");
     const originalText = btn.innerHTML;
-    btn.innerHTML = "🔄 Verificando...";
+    btn.innerHTML = "Verificando...";
     btn.disabled = true;
     await new Promise(resolve => setTimeout(resolve, 500));
     try {
@@ -28,14 +28,14 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
         });
         const data = await res.json();
         if (res.ok) {
-            mostrarToast("✅ Login realizado com sucesso!", "success");
+            mostrarToast("Login realizado com sucesso!", "success");
             sessionStorage.setItem("role", "admin");
             window.location.href = "home.html";
         } else {
-            mostrarToast("❌ " + (data.erro || "Email ou senha inválidos"), "error");
+            mostrarToast("Email ou senha invalidos", "error");
         }
     } catch (err) {
-        mostrarToast("❌ Erro ao conectar ao servidor", "error");
+        mostrarToast("Erro ao conectar ao servidor", "error");
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -43,46 +43,39 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
 });
 
 function entrarSolicitante() {
-    mostrarToast("✅ Entrando como solicitante...", "success");
+    mostrarToast("Entrando como solicitante...", "success");
     sessionStorage.setItem("role", "user");
     window.location.href = "home.html";
 }
 
 document.getElementById("esqueciSenha").addEventListener("click", async (e) => {
     e.preventDefault();
-    
     const email = prompt("Digite seu email cadastrado:");
     if (!email) return;
-    
     if (email !== "admin@lab.com") {
-        mostrarToast("❌ Email não cadastrado no sistema!", "error");
+        mostrarToast("Email nao cadastrado no sistema!", "error");
         return;
     }
-    
-    const novaSenha = prompt("Digite a nova senha (mínimo 3 caracteres):");
+    const novaSenha = prompt("Digite a nova senha (minimo 3 caracteres):");
     if (!novaSenha) return;
-    
     if (novaSenha.length < 3) {
-        mostrarToast("❌ A senha deve ter pelo menos 3 caracteres", "error");
+        mostrarToast("A senha deve ter pelo menos 3 caracteres", "error");
         return;
     }
-    
     try {
         const res = await fetch("/redefinir-senha", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, novaSenha })
         });
-        
         const data = await res.json();
-        
         if (res.ok) {
-            mostrarToast("✅ " + data.mensagem, "success");
+            mostrarToast(data.mensagem, "success");
         } else {
-            mostrarToast("❌ " + (data.erro || "Erro ao redefinir senha"), "error");
+            mostrarToast(data.erro || "Erro ao redefinir senha", "error");
         }
     } catch (err) {
-        mostrarToast("❌ Erro ao conectar ao servidor", "error");
+        mostrarToast("Erro ao conectar ao servidor", "error");
     }
 });
 
