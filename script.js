@@ -29,7 +29,6 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
         const data = await res.json();
         if (res.ok) {
             mostrarToast("✅ Login realizado com sucesso!", "success");
-            // USAR sessionStorage em vez de localStorage
             sessionStorage.setItem("role", "admin");
             window.location.href = "home.html";
         } else {
@@ -51,20 +50,29 @@ function entrarSolicitante() {
 
 document.getElementById("esqueciSenha").addEventListener("click", async (e) => {
     e.preventDefault();
-    const email = prompt("Digite seu email cadastrado:");
+    const email = prompt("Digite seu email cadastrado (admin@lab.com):");
     if (!email) return;
-    const novaSenha = prompt("Digite a nova senha:");
+    
+    const novaSenha = prompt("Digite a nova senha (mínimo 3 caracteres):");
     if (!novaSenha || novaSenha.length < 3) {
         mostrarToast("Senha deve ter pelo menos 3 caracteres", "error");
         return;
     }
+    
     try {
-        await fetch("/redefinir-senha", {
+        const res = await fetch("/redefinir-senha", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, novaSenha })
         });
-        mostrarToast("✅ Senha atualizada com sucesso!", "success");
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+            mostrarToast("✅ " + data.mensagem, "success");
+        } else {
+            mostrarToast("❌ " + data.erro, "error");
+        }
     } catch (err) {
         mostrarToast("❌ Erro ao redefinir senha", "error");
     }
